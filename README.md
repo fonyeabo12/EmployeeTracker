@@ -2,11 +2,10 @@
 
 Contents
 
--index.html file
+-JavaScript file
 
--Contact.html file
+-Sql file
 
--Portfolio.html file
 
 Objective Project objective was to create 3 html files containing a. navbar
 
