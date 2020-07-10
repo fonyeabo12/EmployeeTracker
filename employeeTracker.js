@@ -1,6 +1,7 @@
 const inquirer = require("inquirer");
 const cTable = require("console.table");
 const mysql = require("mysql2");
+require('events').defaultMaxListeners = 17;
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -29,7 +30,7 @@ const runSearch = () => {
             message: "What would you like to do?",
            choices: [
                 'View all employees',
-                'View all employees by Department',
+                'View all Department',
                 'View all employees by Manager',
                 'Add Employee',
                 'Remove Employee',
@@ -43,8 +44,8 @@ const runSearch = () => {
                     employeeSearch();
                     break;
 
-                case 'View all employees by Department':
-                    employeeByDepartmentSearch();
+                case 'View all Department':
+                    DepartmentSearch();
                     break;
 
                 case 'View all employees by Manager':
@@ -77,67 +78,35 @@ const runSearch = () => {
 };
 
 
-function employeeSearch() {
-    console.log('Selecting all employees...\n'); 
-    connection.query('SELECT * FROM employee', function (err, res) {
-        if (err) throw err;
-        res.forEach(r => {
-            console.table([
-                {
-                    id: r.id,
-                    first_name: r.first_name,
-                    last_name: r.last_name,
-                    role_id: r.role_id,
-                    manager_id: r.manager_id
-                },
-            ]);
-            runSearch();
-        });
+const employeeSearch = () => {
+    connection.query('SELECT id, first_name, last_name, role_id, manager_id FROM employee', function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      runSearch();
     });
-};
+  };
 
 
-
-function employeeByDepartmentSearch() {
-    console.log('Selecting all employees by Department...\n'); 
-    connection.query('SELECT * FROM department', function (err, res) {
-        if (err) throw err;
-        res.forEach(r => {
-            console.table([
-                {
-                    id: r.id,
-                    first_name: r.first_name,
-                    last_name: r.last_name,
-                    role_id: r.role_id,
-                    manager_id: r.manager_id
-                },
-            ]);
-            runSearch();
-        });
+const DepartmentSearch = () => {
+    connection.query('SELECT id, name FROM department', function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      runSearch();
     });
-};
+  };
 
 
-function employeeByManagerSearch() {
-    console.log('Selecting all employees Managers...\n'); 
-    connection.query('SELECT * FROM manager', function (err, res) {
-        if (err) throw err;
-        res.forEach(r => {
-            console.table([
-                {
-                    id: r.id,
-                    name: r.name,
-                    
-                },
-            ]);
-            runSearch();
-        });
+const employeeByManagerSearch = () => {
+    connection.query('SELECT id, name  FROM manager', function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      runSearch();
     });
-};
+  };
 
 
 
-function addEmployee() {
+const addEmployee=() =>{
     console.log('Adding an Employee...\n'); 
     connection.query('SELECT * FROM role', function (err, res) {
         if (err) throw err;
@@ -190,20 +159,20 @@ function addEmployee() {
     
 
    
-function removeEmployee() {
+const removeEmployee=()=> {
     console.log('Removing an Employee...\n'); 
     connection.query('SELECT * FROM employee', function (err, res) {
         if (err) throw err;
         const employee = []
         res.forEach(r => {
-            employee.push(`${r.id} ${r.first_name} ${r.last_name}`)
+            employee.push(`${res.id} ${res.first_name} ${res.last_name}`)
         });
 
         inquirer.prompt([
             {
                 name: "Removal",
                 message: "Which employee woud you like to remove?",
-                choices: employee
+                choices: "employee"
             },
             {
                 name: "id",
@@ -214,7 +183,7 @@ function removeEmployee() {
             {
                 name: "roles",
                 type: "List",
-                choices: roles
+                choices: "roles"
             },
             {
                 name: "role_id",
@@ -233,7 +202,7 @@ function removeEmployee() {
 
 };
 
-function updateEmployee() {
+const updateEmployee=() => {
     console.log('Updating an Employee...\n'); 
     connection.query('SELECT * FROM employee', function (err, res) {
         if (err) throw err;
